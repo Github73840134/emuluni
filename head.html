@@ -43,6 +43,7 @@ height: 350px;
 	</div>
 	<div>
 		<h2>Keyboard Shortcuts</h2>
+		<p><b>NOTE:</b> Click on screen to use keyboard commands</p>
 		<p>a: A button</p>
 		<p>s: A+B</p>
 		<p>d: B button</p>
@@ -141,21 +142,34 @@ height: 350px;
 		</div>
 	</div>
 	<div id="codebox">
-		<h2>Code:<button id="run">Run</button><button</h2>
+		<h2>Code:<button id="run">Run</button></h2>
+		<div>
+			<input disabled type="file" accept="text/javascript" id="file"/>
+			<button disabled id="save">Save Code</button>
+		<div>
+			Templates:
+			<select id="temps">
+				<option id="sketch">Sketch Demo</option>
+				<option id="bitmap">Bitmap Demo</option>
+				<option id="flash">Flash Demo</option>
+				<option id="blank">Blank Sketch</option>
+			</select>
+		</div>
 		<textarea id="codearea"></textarea>
 	</div>
-	<div>
+	<div style="bottom:0px;">
 		<h2>Where you can find me:</h2>
 		<a href="https://github.com/Github73840134">Github</a>
 		<a href="https://replit.com/@SethEdwards">Replit</a>
-		<h2>Source:<a href="https://github.com/Github73840134/emuluni"></a></h2>
+		<h2>Source:<a href="https://github.com/Github73840134/emuluni">Link to github repo</a></h2>
 	</div>
 <html>
 <script>
 	var off = 0;
 	var onf = 255;
 	var onh = 127;
-	var default_code = `
+	var examples = {
+		sketch:`
 	//Use the a to move through y, use the b button to move through x, use the both button to draw erase selected pixel
 	var px = 0; // Intialize player_x
 	var py = 0; // Initalize player_y
@@ -203,7 +217,17 @@ height: 350px;
 	}
 	Event(buttons.b,mlr); // Bind B button to move left right
 	Event(buttons.a,mud); // Bind A button to move up down
-	Event(buttons.ab,flip);// Bind A+B to turn on off pixel`
+	Event(buttons.ab,flip);// Bind A+B to turn on off pixel`,
+	bitmap:"blit(bitmaps.bitluni_logo)",
+	flash:`function flash() {
+ 	if (getPixel(0,0) > 0) {
+		fill_screen(0);
+ 	} else {
+		fill_screen(1);
+	}
+	}addInterval(flash,1000)`,
+	blank:" ",
+	}
 	var bitmaps = {
 		bitluni_logo:[
 		[255,0,0,0,255,0],
@@ -241,6 +265,20 @@ height: 350px;
 	var runbutton = document.getElementById("run");
 	var codearea = document.getElementById("codearea");
 	var display = document.getElementById("display");
+	var tempselect = document.getElementById("temps");
+	var fileupload = document.getElementById("file");
+	var namemap = {
+		"Bitmap Demo":"bitmap",
+		"Sketch Demo":"sketch",
+		"Flash Demo":"flash",
+		"Blank Sketch":"blank"
+	}
+	tempselect.onchange = function() {
+		if (confirm("This will overwrite what you currently have written in cache, Continue")) {
+			codearea.value = examples[namemap[this.value]];
+			localStorage.code = codearea.value;
+		}
+	}
 	display.onkeypress = function(event) {
 	//alert(event.key);
 	if (event.key == "a") {
@@ -253,16 +291,13 @@ height: 350px;
 	}
 		if (typeof(Storage) !== "undefined") {
 	  if (localStorage.code == undefined) {
-		  if (confirm("It looks like you havent been here before\nor your browser cache is cleared.\nPress OK to load the sketcher code, or press Cancel to start new")) {
-			codearea.value = default_code;  
-	        localStorage.code = codearea.value;
-		  } else {
+		  alert("It looks like you havent been here before\nor your browser cache is cleared.\nYou can select a Template at the Templates dropdown or start writing in the box")
 	      localStorage.code = "";
-	      }
 	  }
 	} else {
-	  // Sorry! No Web Storage support..
+	  alert("Does not support this browser")
 	}
+
 	codearea.oninput = function() {
 		localStorage.code = this.value;
 	 }
