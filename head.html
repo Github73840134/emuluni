@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<head></head>
+<style>.led {
+	width:10px;
+	height:10px;
+	background-color: rgb(255,127,127);
+	margin:1px;
+}
+#display {
+	width:80px;
+	background-color:black;
+	display: flex;
+	flex-direction: column;
+}
+#codearea {
+width: 400px;
+height: 350px;
+}
+.disprow {
+	display: flex;
+	flex-direction: row;
+	width:auto;
+	margin:2px;
+}
+#codebox {
+	left:50%;
+	top: 0px;
+	position:absolute;
+}</style>
+<html>
+<h1>Emuluni</h1>
+<p>Emulation of the $1 gc</p>
+<div id="display" tabindex="0">
+</div>
+<div>
+	<button id="a">A</button>
+	<button id="both">both</button>
+	<button id="b">B</button>
+
+</div>
+<div>
+<h2>Keyboard Shortcuts</h2>
+<p>
+a: A button,s: A+B,d: B button
+</p>
+</div>
+<div>
+	<h2>How To Use</h2>
+	<p>Code is written in javascript.</p>
+	<p>You can use plain js commands to do js things</p>
+	<p>Code is saved in browser cache with the <i>localStorage</i> api after every change. If your browser does not supported, the emulator will not load</p>
+    <p>Once you have written your code press Run to evaluate it.</p>
+    <p>If your code is not ok an X will be displayed and an alert will popup with the error message</p>
+    <p><b>NOTE:</b>No Sound as of yet, as well as fonts</p>
+	<h2>Classes</h2>
+	<h3>buttons</h3>
+	<div>
+		<h4>a (HTMLDivObject)</h4>
+		<p>A button</p>
+	</div>
+	<div>
+		<h4>b (HTMLDivObject)</h4>
+		<p>B button</p>
+	</div>
+	<div>
+		<h4>ab (HTMLDivObject)</h4>
+		<p>AB button</p>
+	</div>
+	<h3>bitmaps</h3>
+    <p>Useful bitmaps to use with the blit() function</p>
+    <p>Example: blit(bitmaps.bitluni_logo)
+	<div>
+		<h4>bitluni_logo</h4>
+		<p>Bitluni logo</p>
+	</div>
+	<div>
+		<h4>code_failed</h4>
+		<p>It's an X</p>
+	</div>
+	<h3>Commands to interact with the "device"</h3>
+	<div>
+		<h4>addInterval(func,timeout)</h4>
+		<p>This function executes <i>func</i> every <i>timeout</i> ms</p>
+		<p>function must be a function, timeout must be an int</p>
+		<p>Returns: an integer representing the id of the interval</p>
+	</div>
+	<div>
+		<h4>addTimer(function,ms)</h4>
+		<p>This function executes <i>func</i> after <i>timeout</i> ms</p>
+		<p>function must be a function, timeout must be an int</p>
+	</div>
+	<div>
+		<h4>blit(bitmap)</h4>
+		<p>Blit a 6x6 bitmap to the screen</p>
+		<p>bitmap needs to be a 6x6 array (list)</p>
+		<p>Example: blit(bitmaps.bitluni_logo)</p>
+	</div>
+	<div>
+		<h4>Event(type,function)</h4>
+		<p>Bind system event to function, (only used for buttons, system tick coming soon)</p>
+		<p>type must be from the buttons class,function must be a function</p>
+		<p>Example:Event(buttons.a,myFunction);</p>
+		
+	</div>
+	<div>
+		<h3>fill_screen(brig)</h3>
+		<p>Fill the 6x6 screen with a brightness level from 0-255</p>
+		<p>brig must be an int</p>
+		<p>Example: fill_screen(255)</p>
+	</div>
+	<div>
+		<h4>get_screen()</h4>
+		<p>Gets the image on the screen</p>
+		<p>Retutns 6x6 bitmap of screen</p>
+		<p>Example: var s = get_screen();</p>
+	</div>
+	<div>
+		<h4>getPixel(x,y)</h4>
+		<p>Get pixel <i>x</i>,<i>y</i> brightness value</p>
+		<p>Returns: brightness value as int</p>
+		<p>Example: var b = getPixel(0,0);</p>
+	</div>
+	<div>
+		<h3>removeInterval(id)</h3>
+		<p>Cancel interval with id</p>
+		<p>id must be an int (gotten from addInterval())</p>
+	</div>
+	<div>
+		<h3>removeTimer(id)</h3>
+		<p>Cancel timer with id</p>
+		<p>id must be an int (gotten from addTimer())</p>
+	</div>
+	<div>
+		<h3>setPixel(x,y,birg)</h3>
+		<p>Set pixel <i>x</i>,<i>y</i> to brightness value <i>brig</i></p>
+		<p>id must be an int</p>
+		<p>Example: setPixel(0,0,255)</p>
+	</div>
+</div>
+<div id="codebox">
+	<h2>Code:<button id="run">Run</button></h2>
+	<textarea id="codearea"></textarea>
+</div>
+<div>
+<h2>Where you can find me:</h2>
+<a href="https://github.com/Github73840134">Github</a>
+<a href="https://replit.com/@SethEdwards">Replit</a>
+</div>
+<html>
+<script>var off = 0;
+var onf = 255;
+var onh = 127;
+var default_code = `
+//Use the a to move through y, use the b button to move through x, use the both button to draw erase selected pixel
+var px = 0; // Intialize player_x
+var py = 0; // Initalize player_y
+var p = [
+[0,0,0,0,0,0],
+[0,0,0,0,0,0],
+[0,0,0,0,0,0],
+[0,0,0,0,0,0],
+[0,0,0,0,0,0],
+[0,0,0,0,0,0],
+]; //make drawing board bitmap
+blit(p); // draw bitmap on screen
+function mlr() {
+setPixel(px,py,p[py][px]); // Set current player position pixel to canvas
+var s = get_screen(); // Capture screen to restore for later
+if (px < 5) {
+px += 1; // Move right one pixel
+} else {
+px = 0 // Goto beginning
+}
+blit(s); // draw previously captured screen
+setPixel(px,py,255); // set current position pixel to brightest
+
+}
+function mud() {
+setPixel(px,py,p[py][px]); // Set current player position pixel to canvas
+var s = get_screen(); // Capture screen to restore for later
+if (py < 5) {
+py += 1; // Move down one pixel
+} else {
+py = 0 // Move to beginning
+}
+blit(s);
+setPixel(px,py,255);
+
+}
+function flip() {
+if (p[py][px]) {
+p[py][px] = 0; // Turn off pixel in canvas
+} else {
+p[py][px] = 200; // Turn on pixel in canvas
+}
+blit(p); // draw new canvas
+setPixel(px,py,255); // set current player postition brightness to max
+}
+Event(buttons.b,mlr); // Bind B button to move left right
+Event(buttons.a,mud); // Bind A button to move up down
+Event(buttons.ab,flip);// Bind A+B to turn on off pixel`
+var bitmaps = {
+	bitluni_logo:[
+	[255,0,0,0,255,0],
+	[255,0,0,0,0,0],
+	[255,255,255,0,0,0],
+	[255,0,0,0,255,0],
+	[255,0,0,0,255,0],
+	[255,255,255,0,0,0],
+],
+	smiley_face:[
+	[255,off,off,off,off,255],
+	[off,off,off,off,off,off],
+	[255,off,off,off,off,255],
+	[255,off,off,off,off,255],
+	[255,255,off,off,255,off],
+	[off,off,255,255,off,off],
+],
+	code_failed:[
+		[255,off,off,off,off,255],
+		[255,off,off,off,off,255],
+		[off,255,255,255,255,off],
+		[255,off,off,off,off,255],
+		[255,off,off,off,off,255],
+		[255,off,off,off,off,255],
+	
+	]
+}
+var letter = {
+}
+var intervals = {
+};
+var timers = {
+};
+
+var runbutton = document.getElementById("run");
+var codearea = document.getElementById("codearea");
+var display = document.getElementById("display");
+display.onkeypress = function(event) {
+//alert(event.key);
+if (event.key == "a") {
+buttons.a.onclick();
+} else if (event.key == "s") {
+buttons.ab.onclick();
+} else if (event.key == "d") {
+buttons.b.onclick();
+}
+}
+	if (typeof(Storage) !== "undefined") {
+  if (localStorage.code == undefined) {
+	  if (confirm("It looks like you havent been here before\nor your browser cache is cleared.\nPress OK to load the sketcher code, or press Cancel to start new")) {
+		codearea.value = default_code;  
+        localStorage.code = codearea.value;
+	  } else {
+      localStorage.code = "";
+      }
+  }
+} else {
+  // Sorry! No Web Storage support..
+}
+codearea.oninput = function() {
+	localStorage.code = this.value;
+ }
+var buttons = {
+	a:document.getElementById("a"),
+	b:document.getElementById("b"),
+	ab:document.getElementById("both"),
+}
+function makedisplay() {
+	for (let h=0;h<6;h++) {
+		let disprow = document.createElement("div");
+		disprow.className = "disprow";
+		for (let w=0;w<6;w++) {
+			let led = document.createElement("div");
+			led.className = "led";
+			led.id=w.toString()+"x"+h.toString();
+			disprow.appendChild(led);
+		}
+		display.appendChild(disprow);
+	}
+}
+function map(x,in_min,in_max,out_min,out_max) {
+	return ((x-in_min) * (out_max-out_min) / (in_max-in_min) + out_min)
+}
+function blit(bitmap) {
+	for (let h=0;h<6;h++) {
+		for (let w=0;w<6;w++) {
+			let dmo = document.getElementById(w.toString()+"x"+h.toString())
+			console.log(dmo,map(bitmap[h][w],0,255,0,1))
+			dmo.style.opacity = map(bitmap[h][w],0,255,0,1);
+		}
+	}
+}
+function setPixel(x,y,brig) {
+	let dmo = document.getElementById(x.toString()+"x"+y.toString())
+	console.log(dmo,map(brig,0,255,0,1))
+	dmo.style.opacity = map(brig,0,255,0,1);
+}
+function getPixel(x,y) {
+	return map(dmo.style.opacity,0,1,0,255);
+}
+function fill_screen(brig) {
+	for (let h=0;h<6;h++) {
+		for (let w=0;w<6;w++) {
+			let dmo = document.getElementById(w.toString()+"x"+h.toString())
+			console.log(dmo,map(brig,0,255,0,1))
+			dmo.style.opacity = map(brig,0,255,0,1);
+		}
+	}
+}
+function get_screen() {
+	let disp = [[],[],[],[],[],[]];
+		for (let h=0;h<6;h++) {
+			for (let w=0;w<6;w++) {
+    			disp[h].push(getPixel)
+    		}
+		}
+    return disp
+}
+function addInterval(func,timeout) {
+	let itv = setInterval(func,timeout);
+	intervals[intervals.length+1] = itv;
+	return intervals.length;
+}
+function addTimer(func,timeout) {
+	let itv = setTimeout(func,timeout);
+    timers[timers.length+1] = itv;
+    return timers.length;
+}
+function removeInterval(id) {
+	cancelInterval(intervals[id]);
+    intervals.pop(id);
+}
+function removeTimer(id) {
+	cancelTimeout(timers[id]);
+    timers.pop(id);
+}
+function clearAllInterval() {
+	for (let timer in intervals) {
+		console.log(timer);
+		clearInterval(intervals[timer]);
+	}
+	intervals = {}
+}
+function clearAllTimer() {
+	for (let timer in timers) {
+		console.log(timer);
+		clearInterval(timers[timer]);
+	}
+	timers = {}
+}
+function Event(b,func) {
+	b.onclick = func;
+}
+function run(code) {
+	try {
+		var script = eval(code);
+	} catch(err){
+		clearAllInterval();
+		blit(bitmaps.code_failed);
+		alert(err.message)
+	}
+}
+runbutton.onclick = function() {
+	
+	clearAllInterval();
+	fill_screen(255);
+	blit(bitmaps.bitluni_logo);
+	blit(bitmaps.smiley_face);
+	run(codearea.value)
+}
+try {
+	makedisplay();
+	blit(bitmaps.bitluni_logo);
+	let xhr = new XMLHttpRequest();
+} catch(err) {
+	alert(err.message)
+}
+</script>

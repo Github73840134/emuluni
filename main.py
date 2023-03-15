@@ -1,0 +1,13 @@
+import os
+script = open("index.js")
+style = open("index.css")
+head = open("head.html")
+build = open("build.html","w+")
+build.write("<!DOCTYPE html>\n")
+build.write(f"<head>{head.read()}</head>\n")
+build.write(f"<style>{style.read()}</style>\n")
+build.write("<html>\n")
+build.write(open("index.html").read())
+build.write("<html>\n")
+build.write(f"<script>{script.read()}</script>\n")
+build.close()

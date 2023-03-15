@@ -1,0 +1,27 @@
+.led {
+	width:10px;
+	height:10px;
+	background-color: rgb(255,127,127);
+	margin:1px;
+}
+#display {
+	width:80px;
+	background-color:black;
+	display: flex;
+	flex-direction: column;
+}
+#codearea {
+	width: 400px;
+	height: 400px;
+}
+.disprow {
+	display: flex;
+	flex-direction: row;
+	width:auto;
+	margin:2px;
+}
+#codebox {
+	left:25%;
+	top: 0px;
+	position:absolute;
+}
