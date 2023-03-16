@@ -360,6 +360,7 @@ height: 350px;
 	function addInterval(func,timeout) {
 		let itv = setInterval(func,timeout);
 		intervals[intervals.length+1] = itv;
+		alert(intervals[0]);
 		return intervals.length;
 	}
 	function addTimer(func,timeout) {
