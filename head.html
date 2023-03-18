@@ -164,6 +164,7 @@ height: 350px;
 		<h2>Source:<a href="https://github.com/Github73840134/emuluni">Link to github repo</a></h2>
 	</div>
 <html>
+	<iframe src="/" allow="autoplay"> </iframe>
 <script>
 	var off = 0;
 	var onf = 255;
@@ -223,7 +224,7 @@ height: 350px;
  	if (getPixel(0,0) > 0) {
 		fill_screen(0);
  	} else {
-		fill_screen(1);
+		fill_screen(255);
 	}
 	}addInterval(flash,1000)`,
 	blank:" ",
@@ -255,18 +256,122 @@ height: 350px;
 		
 		]
 	}
-	var letter = {
+	
+	var chars = {
+		"0":[
+			[off,255,255,255,255,off],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[off,255,255,255,255,off],
+		],
+		"1":[
+			[off,off,off,255,off,off],
+			[off,off,255,255,off,off],
+			[off,off,off,255,off,off],
+			[off,off,off,255,off,off],
+			[off,off,off,255,off,off],
+			[off,off,255,255,255,off],
+		],
+		"2":[
+			[off,255,255,255,255,off],
+			[off,off,off,off,off,255],
+			[off,255,255,255,255,255],
+			[255,off,off,off,off,off],
+			[255,off,off,off,off,off],
+			[off,255,255,255,255,off],
+		],
+		"3":[
+			[255,255,255,255,255,255],
+			[off,off,off,off,off,255],
+			[off,255,255,255,255,255],
+			[off,255,255,255,255,255],
+			[off,off,off,off,off,255],
+			[255,255,255,255,255,255],
+		],
+		"4":[
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,255,255,255,255,255],
+			[off,off,off,off,off,255],
+			[off,off,off,off,off,255],
+			[off,off,off,off,off,255],
+		],
+		"5":[
+			[255,255,255,255,255,255],
+			[255,off,off,off,off,off],
+			[255,255,255,255,255,255],
+			[255,255,255,255,255,255],
+			[off,off,off,off,off,255],
+			[255,255,255,255,255,255],
+		],
+		"6":[
+			[off,255,255,255,255,off],
+			[255,off,off,off,off,off],
+			[255,off,off,off,off,off],
+			[255,255,255,255,255,255],
+			[255,off,off,off,off,255],
+			[off,255,255,255,255,off],
+		],
+		"7":[
+			[255,255,255,255,255,255],
+			[off,off,off,off,off,255],
+			[off,off,off,off,off,255],
+			[off,off,off,off,off,255],
+			[off,off,off,off,off,255],
+			[off,off,off,off,off,255],
+		],
+		"8":[
+			[off,255,255,255,255,off],
+			[255,off,off,off,off,255],
+			[255,255,255,255,255,255],
+			[255,255,255,255,255,255],
+			[255,off,off,off,off,255],
+			[off,255,255,255,255,off],
+		],
+		"9":[
+			[off,255,255,255,255,off],
+			[255,off,off,off,off,255],
+			[255,255,255,255,255,255],
+			[off,off,off,off,off,255],
+			[off,off,off,off,off,255],
+			[off,255,255,255,255,off],
+		],
 	}
 	var intervals = {
 	};
 	var timers = {
 	};
+	var scope = {};
 	
 	var runbutton = document.getElementById("run");
 	var codearea = document.getElementById("codearea");
 	var display = document.getElementById("display");
 	var tempselect = document.getElementById("temps");
 	var fileupload = document.getElementById("file");
+	var savefile = document.getElementById("save");
+	var filereader = new FileReader();
+	var fileobj;
+	filereader.onload = function() {
+		codearea.value = this.result;
+		localStorage.code = this.result;
+	}
+	fileupload.onchange = function() {
+		fileobj = this.files[0];
+		filereader.readAsText(fileobj)
+		
+	}
+	savefile.onclick = async function() {
+		const fileHandle = await window.showSaveFilePicker();
+		try {
+			const fileStream = await fileHandle.createWritable();
+			await fileStream.write(new Blob([codearea.value], {type: "text/javascript"}));
+			await fileStream.close();
+		} catch(err) {
+			alert("Unable to save file:\n"+err.message)
+		}
+	}
 	var namemap = {
 		"Bitmap Demo":"bitmap",
 		"Sketch Demo":"sketch",
@@ -290,12 +395,14 @@ height: 350px;
 	}
 	}
 		if (typeof(Storage) !== "undefined") {
+			fileupload.disabled = false;
+			savefile.disabled = false;
 	  if (localStorage.code == undefined) {
 		  alert("It looks like you havent been here before\nor your browser cache is cleared.\nYou can select a Template at the Templates dropdown or start writing in the box")
 	      localStorage.code = "";
 	  }
 	} else {
-	  alert("Does not support this browser")
+	  alert("Does not support this browser");
 	}
 
 	codearea.oninput = function() {
@@ -337,6 +444,7 @@ height: 350px;
 		dmo.style.opacity = map(brig,0,255,0,1);
 	}
 	function getPixel(x,y) {
+		let dmo = document.getElementById(x.toString()+"x"+y.toString())
 		return map(dmo.style.opacity,0,1,0,255);
 	}
 	function fill_screen(brig) {
@@ -358,9 +466,8 @@ height: 350px;
 	    return disp
 	}
 	function addInterval(func,timeout) {
-		let itv = setInterval(func,timeout);
+		let itv = setInterval(eval(func),timeout);
 		intervals[intervals.length+1] = itv;
-		alert(intervals[1]);
 		return intervals.length;
 	}
 	function addTimer(func,timeout) {
@@ -398,17 +505,21 @@ height: 350px;
 			var script = eval(code);
 		} catch(err){
 			clearAllInterval();
+			clearAllTimer();
 			blit(bitmaps.code_failed);
 			alert(err.message)
 		}
 	}
 	runbutton.onclick = function() {
-		
+		clearAllTimer();
 		clearAllInterval();
 		fill_screen(255);
 		blit(bitmaps.bitluni_logo);
 		blit(bitmaps.smiley_face);
 		run(codearea.value)
+		if (intervals != {} || timers != {}) {
+			this.innerHTML = "Stop";
+		}
 	}
 	try {
 		makedisplay();
