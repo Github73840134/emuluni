@@ -29,6 +29,7 @@ height: 350px;
 }
 </style>
 <html>
+	<iframe src="" allow="autoplay" id="audio" style="display: none"></iframe>
 	<title>emuluni</title>
 	<h1>Emuluni</h1>
 	<h2>Version 0 alpha</h2>
@@ -107,7 +108,7 @@ height: 350px;
 			
 		</div>
 		<div>
-			<h3>fill_screen(brig)</h3>
+			<h4>fill_screen(brig)</h4>
 			<p>Fill the 6x6 screen with a brightness level from 0-255</p>
 			<p>brig must be an int</p>
 			<p>Example: fill_screen(255)</p>
@@ -125,17 +126,32 @@ height: 350px;
 			<p>Example: var b = getPixel(0,0);</p>
 		</div>
 		<div>
-			<h3>removeInterval(id)</h3>
+			<h4>removeInterval(id)</h4>
 			<p>Cancel interval with id</p>
 			<p>id must be an int (gotten from addInterval())</p>
 		</div>
 		<div>
-			<h3>removeTimer(id)</h3>
+			<h4>removeTimer(id)</h4>
 			<p>Cancel timer with id</p>
 			<p>id must be an int (gotten from addTimer())</p>
 		</div>
 		<div>
-			<h3>setPixel(x,y,birg)</h3>
+			<h4>play(hz)</h4>
+			<p>Play Sound with hz</p>
+			<p>hz must be an int</p>
+		</div>
+		<div>
+			<h4>stop()</h4>
+			<p>Stop playing audio</p>
+		</div>
+		<div>
+			<h4>audioMap(amap)</h4>
+			<p>Sequence of audio</p>
+			<p>amap must be a list contain sublists with [hz,time]</p>
+			<p>Example of audiolist: [[400,100]]</p>
+		</div>
+		<div>
+			<h4>setPixel(x,y,birg)</h4>
 			<p>Set pixel <i>x</i>,<i>y</i> to brightness value <i>brig</i></p>
 			<p>id must be an int</p>
 			<p>Example: setPixel(0,0,255)</p>
@@ -164,7 +180,7 @@ height: 350px;
 		<h2>Source:<a href="https://github.com/Github73840134/emuluni">Link to github repo</a></h2>
 	</div>
 <html>
-	<iframe src="/" allow="autoplay"> </iframe>
+<audio src="" id="sound" autoplay muted/>
 <script>
 	var off = 0;
 	var onf = 255;
@@ -227,7 +243,50 @@ height: 350px;
 		fill_screen(255);
 	}
 	}addInterval(flash,1000)`,
-	blank:" ",
+	blank:"",
+	music:`var a = [
+[130,100],
+[0,50],
+[130,100],
+[0,50],
+[130,100],
+[0,50],
+[130,100],
+[0,400],
+[130,100],
+[0,200],
+[130,100],
+[0,200],
+[130,100],
+[0,200],
+[130,100],
+[0,50],
+[130,100],
+[0,50],
+[notes["E3"],300],
+[notes["F3"],300],
+[notes["G3"],500],
+[261,500],
+[233,500],
+[220,500],
+[notes["G3"],500],
+[0,50],
+[notes["G3"],500],
+[415,500],
+[315,500],
+[0,25],
+[315,500],
+[0,25],
+[315,500],
+[0,25],
+[315,500],
+[0,25],
+[349,500],
+[0,25],
+[notes["G3"],1000],
+[0,50],
+]
+audioMap(a);`
 	}
 	var bitmaps = {
 		bitluni_logo:[
@@ -344,7 +403,24 @@ height: 350px;
 	var timers = {
 	};
 	var scope = {};
-	
+	var notes = {
+		"A3":110,
+		"A3#":233,
+		"B3":123,
+		"C3":130,
+		"D3":146,
+		"E3":164,
+		"F3":174,
+		"G3":196,
+	}
+	const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+// create Oscillator node
+const oscillator = audioCtx.createOscillator();
+
+oscillator.type = "square";
+oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // value in hertz
+oscillator.connect(audioCtx.destination);
 	var runbutton = document.getElementById("run");
 	var codearea = document.getElementById("codearea");
 	var display = document.getElementById("display");
@@ -353,6 +429,7 @@ height: 350px;
 	var savefile = document.getElementById("save");
 	var filereader = new FileReader();
 	var fileobj;
+	var check = 0;
 	filereader.onload = function() {
 		codearea.value = this.result;
 		localStorage.code = this.result;
@@ -376,7 +453,8 @@ height: 350px;
 		"Bitmap Demo":"bitmap",
 		"Sketch Demo":"sketch",
 		"Flash Demo":"flash",
-		"Blank Sketch":"blank"
+		"Blank Sketch":"blank",
+		"Music Sketch":"music",
 	}
 	tempselect.onchange = function() {
 		if (confirm("This will overwrite what you currently have written in cache, Continue")) {
@@ -400,6 +478,17 @@ height: 350px;
 	  if (localStorage.code == undefined) {
 		  alert("It looks like you havent been here before\nor your browser cache is cleared.\nYou can select a Template at the Templates dropdown or start writing in the box")
 	      localStorage.code = "";
+	  } else {
+		  codearea.value = localStorage.code;
+		  for (let i in examples) {
+			  if (examples[i] == codearea.value) {
+				  for (let v in namemap) {
+					if (namemap[v] == i) {
+						tempselect.value = v;
+					}
+				  }
+			  }
+		  }
 	  }
 	} else {
 	  alert("Does not support this browser");
@@ -447,6 +536,16 @@ height: 350px;
 		let dmo = document.getElementById(x.toString()+"x"+y.toString())
 		return map(dmo.style.opacity,0,1,0,255);
 	}
+	function audioMap(amap) {
+		let pt = 0;
+		for (let note of amap) {
+			addTimer(function() {
+				oscillator.frequency.value = note[0];
+			},pt);
+			pt += note[1];
+		}
+		
+	}
 	function fill_screen(brig) {
 		for (let h=0;h<6;h++) {
 			for (let w=0;w<6;w++) {
@@ -478,6 +577,7 @@ height: 350px;
 	function removeInterval(id) {
 		cancelInterval(intervals[id]);
 	    intervals.pop(id);
+	
 	}
 	function removeTimer(id) {
 		cancelTimeout(timers[id]);
@@ -489,6 +589,12 @@ height: 350px;
 			clearInterval(intervals[timer]);
 		}
 		intervals = {}
+	}
+	function play(f) {
+		oscillator.frequency.value = f;
+	}
+	function stop() {
+		oscillator.frequency.value = 0;
 	}
 	function clearAllTimer() {
 		for (let timer in timers) {
@@ -511,13 +617,23 @@ height: 350px;
 		}
 	}
 	runbutton.onclick = function() {
-		clearAllTimer();
-		clearAllInterval();
-		fill_screen(255);
-		blit(bitmaps.bitluni_logo);
-		blit(bitmaps.smiley_face);
-		run(codearea.value)
-		if (intervals != {} || timers != {}) {
+		if (this.innerHTML == "Stop") {
+			clearAllTimer();
+			clearAllInterval();
+			oscillator.frequency.value = 0;
+			this.innerHTML = "Start"
+		} else {
+			oscillator.frequency.value = 0;
+			clearAllTimer();
+			clearAllInterval();
+			fill_screen(255);
+			if (!check) {
+				oscillator.start();
+				check = true;
+			}
+			blit(bitmaps.bitluni_logo);
+			blit(bitmaps.smiley_face);
+			run(codearea.value)
 			this.innerHTML = "Stop";
 		}
 	}
