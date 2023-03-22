@@ -163,13 +163,15 @@ height: 350px;
 			<input disabled type="file" accept="text/javascript" id="file"/>
 			<button disabled id="save">Save Code</button>
 		<div>
-			Templates:
+			Templates/Example:
 			<select id="temps">
 				<option id="sketch">Sketch Demo</option>
 				<option id="bitmap">Bitmap Demo</option>
 				<option id="flash">Flash Demo</option>
 				<option id="music">Music Demo</option>
 				<option id="blank">Blank Sketch</option>
+				<option id="allsounds">Soundboard</option>
+				<option id="chartest">Char List</option>
 			</select>
 		</div>
 		<textarea id="codearea"></textarea>
@@ -294,7 +296,53 @@ audioMap(ons);
 [notes["G3"],1000],
 [0,50],
 ]
-audioMap(a);`
+audioMap(a);`,
+	allsounds:`// Use A and B keys to navigate through the sounds.
+// Press both to replay sound
+// Time is in milliseconds
+var i = 0;
+function nextSound() {
+if (i < Object.keys(sounds).length-1) {
+ i += 1;
+}
+blit(chars[i.toString()])
+audioMap(sounds[Object.keys(sounds)[i]]);
+}
+function prevSound() {
+if (i > 0) {
+ i -= 1
+}
+blit(chars[i.toString()])
+audioMap(sounds[Object.keys(sounds)[i]]);
+}
+audioMap(sounds[Object.keys(sounds)[i]])
+blit(chars[i.toString()])
+Event(buttons.b,nextSound);
+Event(buttons.a,prevSound);
+Event(buttons.ab,function() {
+audioMap(sounds[Object.keys(sounds)[i]])
+});
+`,
+		chartest:`// Use A and B keys to navigate through the chrs.
+var i = 0;
+var m = Object.keys(chars).length
+function nextChar() {
+if (i < m-1) {
+ i += 1;
+}
+blit(chars[Object.keys(chars)[i]])
+}
+function prevChar() {
+if (i > 0) {
+ i -= 1
+}
+blit(chars[Object.keys(chars)[i]])
+}
+blit(chars[Object.keys(chars)[i]])
+Event(buttons.b,nextChar);
+Event(buttons.a,prevChar);
+
+`
 	}
 	var bitmaps = {
 		bitluni_logo:[
@@ -405,6 +453,214 @@ audioMap(a);`
 			[off,off,off,off,off,255],
 			[off,255,255,255,255,off],
 		],
+		"a":[
+			[255,255,255,255,255,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,255,255,255,255,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+		],
+		"b":[
+			[255,255,255,255,off,off],
+			[255,off,off,off,255,off],
+			[255,off,off,off,255,off],
+			[255,255,255,255,off,off],
+			[255,off,off,off,255,off],
+			[255,255,255,255,off,off],
+		],
+		"c":[
+			[off,255,255,255,255,255],
+			[255,off,off,off,off,off],
+			[255,off,off,off,off,off],
+			[255,off,off,off,off,off],
+			[255,off,off,off,off,off],
+			[off,255,255,255,255,255],
+		],
+		"d":[
+			[255,255,255,255,255,off],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,255,255,255,255,off],
+		],
+		"e":[
+			[255,255,255,255,255,255],
+			[255,off,off,off,off,off],
+			[255,255,255,255,255,255],
+			[255,255,255,255,255,255],
+			[255,off,off,off,off,off],
+			[255,255,255,255,255,255],
+		],
+		"f":[
+			[255,255,255,255,255,255],
+			[255,off,off,off,off,off],
+			[255,off,off,off,off,off],
+			[255,255,255,255,255,255],
+			[255,off,off,off,off,off],
+			[255,off,off,off,off,off],
+		],
+		"g":[
+			[off,255,255,255,255,off],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[off,255,255,255,255,255],
+			[off,off,off,off,off,255],
+			[255,255,255,255,255,255],
+		],
+		"h":[
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,255,255,255,255,255],
+			[255,255,255,255,255,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+		],
+		"i":[
+			[255,255,255,255,255,255],
+			[off,off,255,255,off,off],
+			[off,off,255,255,off,off],
+			[off,off,255,255,off,off],
+			[off,off,255,255,off,off],
+			[255,255,255,255,255,255],
+		],
+		"j":[
+			[off,off,255,255,255,off],
+			[off,off,off,255,off,off],
+			[off,off,off,255,off,off],
+			[off,off,off,255,off,off],
+			[off,255,off,255,off,off],
+			[off,off,255,off,off,off],
+		],
+		"k":[
+			[255,off,off,off,off,255],
+			[255,off,off,off,255,off],
+			[255,255,255,255,off,off],
+			[255,255,255,255,off,off],
+			[255,off,off,off,255,off],
+			[255,off,off,off,off,255],
+		],
+		"l":[
+			[255,off,off,off,off,off],
+			[255,off,off,off,off,off],
+			[255,off,off,off,off,off],
+			[255,off,off,off,off,off],
+			[255,off,off,off,off,off],
+			[255,255,255,255,255,255],
+		],
+		"m":[
+			[255,255,off,off,255,255],
+			[255,off,255,255,off,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+		],
+		"n":[
+			[255,off,off,off,off,255],
+			[255,255,off,off,off,255],
+			[255,off,255,off,off,255],
+			[255,off,off,255,off,255],
+			[255,off,off,off,255,255],
+			[255,off,off,off,off,255],
+		],
+		"o":[
+			[255,255,255,255,255,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,255,255,255,255,255],
+		],
+		"p":[
+			[255,255,255,255,255,off],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,255,255,255,255,off],
+			[255,off,off,off,off,off],
+			[255,off,off,off,off,off],
+		],
+		"q":[
+			[off,255,255,255,255,off],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,off,off,255,off,255],
+			[off,255,255,255,255,off],
+			[off,off,off,off,off,255],
+		],
+		"r":[
+			[255,255,255,255,255,off],
+			[255,off,off,off,off,255],
+			[255,off,off,off,255,off],
+			[255,255,255,255,off,off],
+			[255,off,off,off,255,off],
+			[255,off,off,off,255,off],
+		],
+		"s":[
+			[off,255,255,255,255,255],
+			[255,off,off,off,off,off],
+			[255,255,255,255,255,off],
+			[off,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[off,255,255,255,255,off],
+		],
+		"t":[
+			[255,255,255,255,255,255],
+			[off,off,255,255,off,off],
+			[off,off,255,255,off,off],
+			[off,off,255,255,off,off],
+			[off,off,255,255,off,off],
+			[off,off,255,255,off,off],
+		],
+		"u":[
+			[off,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[off,255,255,255,255,off],
+		],
+		"v":[
+			[off,off,255,off,off,255],
+			[off,off,255,off,off,255],
+			[off,off,255,off,off,255],
+			[off,off,255,off,off,255],
+			[off,off,off,255,off,255],
+			[off,off,off,off,255,255],
+		],
+		"w":[
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,off,255,255,off,255],
+			[255,off,255,255,off,255],
+			[255,255,255,255,255,255],
+		],
+		"x":[
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[off,255,255,255,255,off],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+		],
+		"y":[
+			[255,off,off,off,off,255],
+			[255,off,off,off,off,255],
+			[off,255,255,255,255,off],
+			[off,off,255,255,off,off],
+			[off,off,255,255,off,off],
+			[off,off,255,255,off,off],
+		],
+		"z":[
+			[255,255,255,255,255,255],
+			[off,off,off,off,off,255],
+			[off,off,off,off,255,off],
+			[off,off,255,255,off,off],
+			[off,255,off,off,off,off],
+			[255,255,255,255,255,255],
+		],
 	}
 	var intervals = {
 	};
@@ -421,6 +677,60 @@ audioMap(a);`
 		"F3":174,
 		"G3":196,
 	}
+	var sounds = {
+ok:[
+[notes["C3"],50],
+[0,30],
+[notes["C3"]*3,50],
+[0,30],
+[notes["C3"]*2,50],
+[0,30],
+[notes["C3"]*4,50],
+[0,0],
+],
+error:[
+[120,1000],
+[0,0],
+],
+goal:[
+[notes["C3"]*4,50],
+[0,50],
+[notes["C3"]*4,1000],
+[0,0],
+],
+click:[
+[277*2,25],
+[0,0]
+],
+death:[
+[311,50],
+[211,50],
+[0,0],
+],
+w7cs:[
+[110,500],
+[0,0]
+],
+w10cs:[
+[290,100],
+[196,100],
+[220,300],
+[0,0],
+],
+w10ex:[
+[174,100],
+[196,100],
+[260,300],
+[0,0]
+],
+w10sg:[
+[260,100],
+[164*2,100],
+[260,100],
+[130,300],
+[0,0]
+]
+}
 	var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 // create Oscillator node
@@ -464,6 +774,8 @@ oscillator.connect(g);
 		"Flash Demo":"flash",
 		"Blank Sketch":"blank",
 		"Music Demo":"music",
+		"Char List":"chartest",
+		"Soundboard":"allsounds"
 	}
 	tempselect.onchange = function() {
 		if (confirm("This will overwrite what you currently have written in cache, Continue")) {
