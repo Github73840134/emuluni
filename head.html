@@ -167,7 +167,7 @@ height: 350px;
 			<select id="temps">
 				<option id="sketch">Sketch Demo</option>
 				<option id="bitmap">Bitmap Demo</option>
-				<option id="flash">Flash Demo</option
+				<option id="flash">Flash Demo</option>
 				<option id="music">Music Demo</option>
 				<option id="blank">Blank Sketch</option>
 			</select>
@@ -188,9 +188,12 @@ height: 350px;
 	var onh = 127;
 	var examples = {
 		sketch:`
+
 	//Use the a to move through y, use the b button to move through x, use the both button to draw erase selected pixel
 	var px = 0; // Intialize player_x
 	var py = 0; // Initalize player_y
+var ons = [[notes["C3"],50],[notes["G3"],50],[0,0]]
+var ofs = [[notes["G3"],50],[notes["C3"],50],[0,0]]
 	var p = [
 	[0,0,0,0,0,0],
 	[0,0,0,0,0,0],
@@ -205,6 +208,7 @@ height: 350px;
 	var s = get_screen(); // Capture screen to restore for later
 	if (px < 5) {
 	px += 1; // Move right one pixel
+audioMap([[notes["C3"],50],[0,0]]);
 	} else {
 	px = 0 // Goto beginning
 	}
@@ -217,6 +221,7 @@ height: 350px;
 	var s = get_screen(); // Capture screen to restore for later
 	if (py < 5) {
 	py += 1; // Move down one pixel
+audioMap([[notes["C3"],50],[0,0]]);
 	} else {
 	py = 0 // Move to beginning
 	}
@@ -227,8 +232,10 @@ height: 350px;
 	function flip() {
 	if (p[py][px]) {
 	p[py][px] = 0; // Turn off pixel in canvas
-	} else {
+audioMap(ofs);	
+} else {
 	p[py][px] = 200; // Turn on pixel in canvas
+audioMap(ons);
 	}
 	blit(p); // draw new canvas
 	setPixel(px,py,255); // set current player postition brightness to max
@@ -455,7 +462,7 @@ oscillator.connect(audioCtx.destination);
 		"Sketch Demo":"sketch",
 		"Flash Demo":"flash",
 		"Blank Sketch":"blank",
-		"Music Sketch":"music",
+		"Music Demo":"music",
 	}
 	tempselect.onchange = function() {
 		if (confirm("This will overwrite what you currently have written in cache, Continue")) {
