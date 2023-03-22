@@ -421,14 +421,15 @@ audioMap(a);`
 		"F3":174,
 		"G3":196,
 	}
-	const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+	var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 // create Oscillator node
-const oscillator = audioCtx.createOscillator();
-
+var oscillator = audioCtx.createOscillator();
 oscillator.type = "square";
-oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // value in hertz
-oscillator.connect(audioCtx.destination);
+	var g = audioCtx.createGain();
+oscillator.connect(g);
+	g.connect(audioCtx.destination)
+	g.gain.value=0;
 	var runbutton = document.getElementById("run");
 	var codearea = document.getElementById("codearea");
 	var display = document.getElementById("display");
@@ -548,6 +549,11 @@ oscillator.connect(audioCtx.destination);
 		let pt = 0;
 		for (let note of amap) {
 			addTimer(function() {
+				if (note[0] == 0) {
+					g.gain.value = 0
+				} else {
+					g.gain.value = 1
+				}
 				oscillator.frequency.value = note[0];
 			},pt);
 			pt += note[1];
@@ -600,9 +606,11 @@ oscillator.connect(audioCtx.destination);
 	}
 	function play(f) {
 		oscillator.frequency.value = f;
+		g.gain.value = 1;
 	}
 	function stop() {
 		oscillator.frequency.value = 0;
+		g.gain.value=0;
 	}
 	function clearAllTimer() {
 		for (let timer in timers) {
@@ -629,9 +637,11 @@ oscillator.connect(audioCtx.destination);
 			clearAllTimer();
 			clearAllInterval();
 			oscillator.frequency.value = 0;
+			g.gain.value=0;
 			this.innerHTML = "Start"
 		} else {
 			oscillator.frequency.value = 0;
+			g.gain.value=1;
 			clearAllTimer();
 			clearAllInterval();
 			fill_screen(255);
