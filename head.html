@@ -855,6 +855,9 @@ oscillator.connect(g);
 	function map(x,in_min,in_max,out_min,out_max) {
 		return ((x-in_min) * (out_max-out_min) / (in_max-in_min) + out_min)
 	}
+	function fmap(x,in_min,in_max,out_min,out_max) {
+		return parseInt((x-in_min) * (out_max-out_min) / (in_max-in_min) + out_min)
+	}
 	function blit(bitmap) {
 		for (let h=0;h<6;h++) {
 			for (let w=0;w<6;w++) {
@@ -880,7 +883,7 @@ oscillator.connect(g);
 				if (note[0] == 0) {
 					g.gain.value = 0
 				} else {
-					g.gain.value = 1
+					g.gain.value = 0.5
 				}
 				oscillator.frequency.value = note[0];
 			},pt);
@@ -934,7 +937,7 @@ oscillator.connect(g);
 	}
 	function play(f) {
 		oscillator.frequency.value = f;
-		g.gain.value = 1;
+		g.gain.value = 0.5;
 	}
 	function stop() {
 		oscillator.frequency.value = 0;
