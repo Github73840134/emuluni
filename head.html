@@ -32,7 +32,7 @@ height: 350px;
 	<iframe src="" allow="autoplay" id="audio" style="display: none"></iframe>
 	<title>emuluni</title>
 	<h1>Emuluni</h1>
-	<h2>Version 0 alpha</h2>
+	<h2>Version 0.3.1 alpha</h2>
 	<p>Emulation of the $1 gc</p>
 	<div id="display" tabindex="0">
 	</div>
@@ -298,6 +298,16 @@ audioMap(ons);
 ]
 audioMap(a);`,
 	allsounds:`// Use A and B keys to navigate through the sounds.
+// Sound List
+// 0: Code OK
+// 1: Incorrect
+// 2: Triumph
+// 3: Click
+// 4: Death
+// 5: Windows 7 Critcal Stop
+// 6: Windows 10 Foreground
+// 7: Windows 10 Background
+// 8: Windows 10 System Generic Notification
 // Press both to replay sound
 // Time is in milliseconds
 var i = 0;
@@ -322,6 +332,7 @@ Event(buttons.a,prevSound);
 Event(buttons.ab,function() {
 audioMap(sounds[Object.keys(sounds)[i]])
 });
+
 `,
 		chartest:`// Use A and B keys to navigate through the chrs.
 var i = 0;
@@ -329,19 +340,24 @@ var m = Object.keys(chars).length
 function nextChar() {
 if (i < m-1) {
  i += 1;
+ audioMap(sounds.click)
+} else {
+audioMap(sounds.w7cs);
 }
 blit(chars[Object.keys(chars)[i]])
 }
 function prevChar() {
 if (i > 0) {
  i -= 1
+audioMap(sounds.click)
+} else {
+audioMap(sounds.w7cs);
 }
 blit(chars[Object.keys(chars)[i]])
 }
 blit(chars[Object.keys(chars)[i]])
 Event(buttons.b,nextChar);
 Event(buttons.a,prevChar);
-
 `
 	}
 	var bitmaps = {
@@ -614,7 +630,7 @@ Event(buttons.a,prevChar);
 			[off,off,255,255,off,off],
 		],
 		"u":[
-			[off,off,off,off,off,255],
+			[255,off,off,off,off,255],
 			[255,off,off,off,off,255],
 			[255,off,off,off,off,255],
 			[255,off,off,off,off,255],
@@ -679,13 +695,13 @@ Event(buttons.a,prevChar);
 	}
 	var sounds = {
 ok:[
-[notes["C3"],50],
-[0,30],
-[notes["C3"]*3,50],
-[0,30],
 [notes["C3"]*2,50],
 [0,30],
 [notes["C3"]*4,50],
+[0,30],
+[notes["C3"]*4,50],
+[0,30],
+[notes["C3"]*8,50],
 [0,0],
 ],
 error:[
@@ -901,12 +917,12 @@ oscillator.connect(g);
 	    return timers.length;
 	}
 	function removeInterval(id) {
-		cancelInterval(intervals[id]);
+		clearInterval(intervals[id]);
 	    intervals.pop(id);
 	
 	}
 	function removeTimer(id) {
-		cancelTimeout(timers[id]);
+		clearTimeout(timers[id]);
 	    timers.pop(id);
 	}
 	function clearAllInterval() {
